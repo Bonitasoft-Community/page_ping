@@ -1,0 +1,114 @@
+<!doctype html>
+<!--[if lt IE 7]>
+<html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>
+<html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>
+<html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <title>Ping</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="pageResource?page=custompage_ping&location=style/animate.css" />
+    <link rel="stylesheet" href="pageResource?page=custompage_ping&location=style/bootstrap.min.css">
+	<link rel="stylesheet" href="pageResource?page=custompage_ping&location=style/main.css">
+	<link rel="stylesheet" href="pageResource?page=custompage_ping&location=style/style.css">
+ 
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+	<script type="text/javascript" src="https://www.google.com/uds/?file=visualization&amp;v=1&amp;hl=fr&amp;packages=corechart&amp;async=2"></script>
+	<link type="text/css" href="https://www.google.com/uds/api/visualization/1.0/ff67c3772da186a412ae3231c32409e9/ui+fr.css" rel="stylesheet">
+	<script type="text/javascript" src="https://www.google.com/uds/api/visualization/1.0/ff67c3772da186a412ae3231c32409e9/format+fr,default+fr,ui+fr,corechart+fr.I.js"></script>
+	<link href="https://ajax.googleapis.com/ajax/static/modules/gviz/1.0/core/tooltip.css" rel="stylesheet" type="text/css">
+		
+		
+</head>
+<body ng-app="pingmonitor">
+
+<h1><center>Ping the server</center></h1>
+
+
+<div class="container" id="accordion">
+
+
+	<div class="col-lg-12">
+		<div class="bs-component"  ng-controller="PingControler as pingctrl">
+			<legend class="text-primary"><span class="glyphicon glyphicon-th"></span>Ping server</legend>
+			<div class="panel panel-primary">
+				<div class="explanation">
+				Ping Controler.
+				</div>
+				
+				<div id="collectwait" style="background-color:green;color: #FFFFFF;">Please wait, collect in progress</div>
+				<button id="collectbtn" ng-click="pingctrl.ping()" class="btn btn-info btn-xs">Collect informations</button>
+				<h3>Server state</h3>
+				<table class="table table-striped table-hover table-condensed">
+					<tr> <td>Ping date</td><td>{{pingctrl.pingdate}}</td></tr>					
+					<tr> <td>Ping info</td><td>{{pingctrl.pinginfo}}</td></tr>	
+				</table>
+				<h3>List of processes</h3>
+				<table class="table table-striped table-hover table-condensed" style="background-color:#C49E71">
+					<tr>
+						<th>Name</th>
+						<th>Version</th>
+						<th>State</th>
+						<th>Deployed</th>
+					</tr>
+					<tr ng-repeat="processinfo in pingctrl.listprocesses track by $index">
+						<td>{{processinfo.name}}</td>
+						<td>{{processinfo.version}}</td>
+						<td>{{processinfo.state}}</td>
+						<td>{{processinfo.deployeddate}}</td>
+					</tr>
+				</table>
+				
+				<h3>List of users</h3>
+				<table class="table table-striped table-hover table-condensed" style="background-color:#C49E71">
+					<tr>
+						<th>UserName</th>
+						<th>FirstName</th>
+						<th>lastName</th>
+						<th>Enable</th>
+					</tr>
+					<tr ng-repeat="userinfo in pingctrl.listusers track by $index">
+						<td>{{userinfo.username}}</td>
+						<td>{{userinfo.firstname}}</td>
+						<td>{{userinfo.lastname}}</td>
+						<td>{{userinfo.enable}}</td>
+					</tr>
+				</table>
+				
+				<h3>Chart</h3>
+				
+				<div google-chart chart="chartObject" style="height: 400px; width: 100%; position: relative; "></div>
+			</div>
+		</div>
+	</div>
+	
+		
+</div>
+
+
+
+<!-- Third party dependencies -->
+
+<script src="pageResource?page=custompage_ping&location=3rd-party/jquery.min.js"></script>
+
+<script src="pageResource?page=custompage_ping&location=3rd-party/angular.min.js"></script>
+
+<script src="pageResource?page=custompage_ping&location=3rd-party/angular-resource.min.js"></script>
+<script src="pageResource?page=custompage_ping&location=3rd-party/angular-cookies.min.js"></script>
+
+<script src="pageResource?page=custompage_ping&location=3rd-party/bootstrap/js/bootstrap.min.js"></script>
+<script src="pageResource?page=custompage_ping&location=3rd-party/angular-bootstrap-tpls.min.js"></script>
+<script src="pageResource?page=custompage_ping&location=3rd-party/angular-file-upload.js"></script> 
+<script src="pageResource?page=custompage_ping&location=3rd-party/ng-google-chart.js"></script> 
+
+
+<!-- Application dependencies -->
+<script src="pageResource?page=custompage_ping&location=pingmonitor.js"></script>
+
+</body>
+</html>		
