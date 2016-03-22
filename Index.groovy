@@ -166,10 +166,9 @@ public class Index implements PageController {
 								indexContent = s.getText()
 						}
 						
-						def String pageResource="pageResource?&page="+ request.getParameter("page")+"&location=";
-						
-						indexContent= indexContent.replace("@_USER_LOCALE_@", request.getParameter("locale"));
-						indexContent= indexContent.replace("@_PAGE_RESOURCE_@", pageResource);
+						// def String pageResource="pageResource?&page="+ request.getParameter("page")+"&location=";
+						// indexContent= indexContent.replace("@_USER_LOCALE_@", request.getParameter("locale"));
+						// indexContent= indexContent.replace("@_PAGE_RESOURCE_@", pageResource);
 						
 						response.setCharacterEncoding("UTF-8");
 						PrintWriter out = response.getWriter();
