@@ -8,6 +8,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.lang.Runtime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.json.simple.JSONObject;
 import org.codehaus.groovy.tools.shell.CommandAlias;
@@ -60,6 +62,12 @@ import org.bonitasoft.engine.command.CommandDescriptor;
 import org.bonitasoft.engine.command.CommandCriterion;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+
+import org.bonitasoft.log.event.BEvent;
+import org.bonitasoft.log.event.BEvent.Level;
+import org.bonitasoft.log.event.BEventFactory;
+
+import org.bonitasoft.ext.properties.BonitaProperties;
 	
 import com.bonitasoft.users.UsersOperation;
  
@@ -78,10 +86,10 @@ public class Index implements PageController {
 			PrintWriter out = response.getWriter()
 
 			String action=request.getParameter("action");
-			logger.info("###################################### action is["+action+"] !");
+			logger.info("###################################### action is["+action+"] 2.0!");
 			if (action==null || action.length()==0 )
 			{
-				logger.severe("###################################### RUN Default !");
+				// logger.info("RUN Default !");
 				
 				runTheBonitaIndexDoGet( request, response,pageResourceProvider,pageContext);
 				return;
@@ -92,13 +100,15 @@ public class Index implements PageController {
 			PlatformMonitoringAPI platformMonitoringAPI = TenantAPIAccessor.getPlatformMonitoringAPI(session);
 			IdentityAPI identityApi = TenantAPIAccessor.getIdentityAPI(session);
 			
+			HashMap<String,Object> answer = null;
+			List<BEvent> listEvents = new ArrayList<BEvent>();
 			
 			if ("ping".equals(action))
 			{
-				HashMap<String,Object> pingDetails = new HashMap<String,Object>();
+				answer = new HashMap<String,Object>();
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-				pingDetails.put("pingcurrentdate", sdf.format( new Date() ) );
-				pingDetails.put("pingserverinfo", "server is up");
+				answer.put("pingcurrentdate", sdf.format( new Date() ) );
+				answer.put("pingserverinfo", "server is up 2.1");
 				
 				List<ActivityTimeLine> listActivities = new  ArrayList<ActivityTimeLine>();
 				listActivities.add( ActivityTimeLine.getActivityTimeLine("Choose beverage", 9, 11));
@@ -108,7 +118,7 @@ public class Index implements PageController {
 				listActivities.add( ActivityTimeLine.getActivityTimeLine("Inject hot water", 13, 14));
 				listActivities.add( ActivityTimeLine.getActivityTimeLine("Have fun with Bonita", 14, 17));
 				
-				pingDetails.put("chartObject", getChartTimeLine("Chart Example", listActivities));
+				answer.put("chartObject", getChartTimeLine("Chart Example", listActivities));
 				
 				
 				// list of process
@@ -126,21 +136,84 @@ public class Index implements PageController {
 					processMap.put("deployeddate", simpleDateFormat.format( processDeployment.getDeploymentDate() ) );
 					listProcesses.add( processMap);
 				}
-				pingDetails.put("listprocesses", listProcesses);
+				answer.put("listprocesses", listProcesses);
 	
                 final UsersOperation userOperations = new UsersOperation();
                 final List<Map<String, Object>> listMapUsers = userOperations.getUsersList(identityApi);
-                pingDetails.put("listusers", listMapUsers);
+                answer.put("listusers", listMapUsers);
                 
 				
-				String jsonDetailsSt = JSONValue.toJSONString( pingDetails );
+				listEvents.add( new BEvent("com.bonitasoft.ping", 1, Level.INFO, listMapUsers.size()+" Users found", "Number of users found in the system"));
+				listEvents.add( new BEvent("com.bonitasoft.ping", 1, Level.APPLICATIONERROR, "Fake error", "This is not a real error", "No consequence", "don't call anybody"));
+				
+				
+						
+			}
+			if ("saveprops".equals(action))	{
+				String jsonparam=request.getParameter("jsonparam");
+				final HashMap<String, Object>  jsonHash=null;
+				
+				if (jsonparam != null && jsonparam.length() > 0 ) {
+					jsonHash = (HashMap<String, Object>) JSONValue.parse( jsonparam );
+				}
+				answer = new HashMap<String,Object>();
+				if (jsonHash!=null)
+				{
+					try
+					{
+						BonitaProperties bonitaProperties = new BonitaProperties( pageResourceProvider );
+
+						listEvents.addAll( bonitaProperties.load() );
+						bonitaProperties.setProperty( session.getUserId()+"_firstname", jsonHash.get("firstname") );
+						listEvents.addAll(  bonitaProperties.store());
+					}
+					catch( Exception e )
+					{
+						logger.severe("Exception "+e.toString());
+						listEvents.add( new BEvent("com.bonitasoft.ping", 10, Level.APPLICATIONERROR, "Error using BonitaProperties", "Error :"+e.toString(), "Properties is not saved", "Check exception"));
+					}
+				}
+				else
+					listEvents.add( new BEvent("com.bonitasoft.ping", 11, Level.APPLICATIONERROR, "JsonHash can't be decode", "the parameters in Json can't be decode", "Properties is not saved", "Check page"));
+
+			}
+			if ("loadprops".equals(action)) {
+				answer = new HashMap<String,Object>();
+				try
+				{
+					logger.info("Load properties");
+
+					BonitaProperties bonitaProperties = new BonitaProperties( pageResourceProvider );
+					listEvents.addAll( bonitaProperties.load() );
+					logger.info("Load done, events = "+listEvents.size() );
+
+					String firstName = bonitaProperties.getProperty( session.getUserId()+"_firstname" );
+					logger.info("Load done, firstName["+firstName+"]" );
+					answer.put("firstname", (firstName==null ? "" : firstName) );
+		
+				}
+				catch( Exception e )
+				{
+					logger.severe("Exception "+e.toString());
+					listEvents.add( new BEvent("com.bonitasoft.ping", 10, Level.APPLICATIONERROR, "Error using BonitaProperties", "Error :"+e.toString(), "Properties is not saved", "Check exception"));
+
+				}
+
+			}
+			
+			
+			// save the result
+			if (answer!=null)
+			{
+				answer.put("listevents", BEventFactory.getHtml(listEvents) );
+
+				String jsonDetailsSt = JSONValue.toJSONString( answer );
 	   
 				out.write( jsonDetailsSt );
 				out.flush();
 				out.close();				
-				return;				
+				return;		
 			}
-			
 			out.write( "Unknow command" );
 			out.flush();
 			out.close();
