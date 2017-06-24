@@ -6,10 +6,19 @@
 (function() {
 
 
-var appCommand = angular.module('pingmonitor', ['googlechart', 'ui.bootstrap','ngSanitize', 'ngModal']);
+var appCommand = angular.module('pingmonitor', ['googlechart', 'ui.bootstrap','ngSanitize', 'ngModal', 'ngMaterial']);
 
 
+/* Material : for the autocomplete
+ * need 
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
 
+  <!-- Angular Material Library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js">
+ */
 
 
 
@@ -21,20 +30,21 @@ var appCommand = angular.module('pingmonitor', ['googlechart', 'ui.bootstrap','n
 
 // Ping the server
 appCommand.controller('PingControler',
-	function ( $http, $scope,$sce ) {
+	function ( $http, $scope,$sce,$filter ) {
 
 	this.pingdate='';
 	this.pinginfo='';
 	this.listevents='';
-	$('#collectwait').hide();
+	this.inprogress=false;
+	
 	this.ping = function()
 	{
-		$('#collectbtn').hide();
-		$('#collectwait').show();
+		
 		this.pinginfo="Hello";
 		
 		var self=this;
-
+		self.inprogress=true;
+		
 		$http.get( '?page=custompage_ping&action=ping' )
 				.success( function ( jsonResult ) {
 						console.log("history",jsonResult);
@@ -45,25 +55,85 @@ appCommand.controller('PingControler',
 						self.listevents		= jsonResult.listevents;
 						
 						$scope.chartObject		 	= JSON.parse(jsonResult.chartObject);
-								
-						$('#collectbtn').show();
-						$('#collectwait').hide();
+		
+						self.inprogress=false;
+						
+						
 				})
 				.error( function() {
 					alert('an error occure');
-						$('#collectbtn').show();
-						$('#collectwait').hide();
+					self.inprogress=false;
 					});
 				
 	}
 
-	<!-- properties -->
+
+	// -----------------------------------------------------------------------------------------
+	//  										Autocomplete
+	// -----------------------------------------------------------------------------------------
+	this.autocomplete={};
+	
+	this.queryUser = function(searchText) {
+		var self=this;
+		console.log("QueryUser HTTP CALL["+searchText+"]");
+		
+		self.autocomplete.inprogress=true;
+		self.autocomplete.search = searchText;
+ 
+		var param={ 'userfilter' :  self.autocomplete.search};
+		
+		
+		var json = encodeURI( angular.toJson( param, false));
+		
+		return $http.get( '?page=custompage_ping&action=queryusers&jsonparam='+json )
+		.then( function ( jsonResult ) {
+			console.log("QueryUser HTTP SUCCESS.1 - result= "+angular.toJson(jsonResult, false));
+				self.autocomplete.inprogress=false;
+			 	self.autocomplete.listUsers =  jsonResult.data.listUsers;
+				console.log("QueryUser HTTP SUCCESS length="+self.autocomplete.listUsers.length);
+				return self.autocomplete.listUsers;
+				},  function ( jsonResult ) {
+				console.log("QueryUser HTTP THEN");
+		});
+
+	  };
+	  
+	// -----------------------------------------------------------------------------------------
+	//  										Excel
+	// -----------------------------------------------------------------------------------------
+
+	this.exportData = function () 
+	{  
+		//Start*To Export SearchTable data in excel  
+	// create XLS template with your field.  
+		var mystyle = {         
+        headers:true,        
+			columns: [  
+			{ columnid: 'name', title: 'Name'},
+			{ columnid: 'version', title: 'Version'},
+			{ columnid: 'state', title: 'State'},
+			{ columnid: 'deployeddate', title: 'Deployed date'},
+			],         
+		};  
+	
+        //get current system date.         
+        var date = new Date();  
+        $scope.CurrentDateTime = $filter('date')(new Date().getTime(), 'MM/dd/yyyy HH:mm:ss');          
+		var trackingJson = this.listprocesses
+        //Create XLS format using alasql.js file.  
+        alasql('SELECT * INTO XLS("Process_' + $scope.CurrentDateTime + '.xls",?) FROM ?', [mystyle, trackingJson]);  
+    };
+    
+
+	// -----------------------------------------------------------------------------------------
+	//  										Properties
+	// -----------------------------------------------------------------------------------------
 	this.propsFirstName='';
 	this.saveProps = function() {
 		var self=this;
 		var param={ 'firstname': this.propsFirstName };
 					  
-		var json= angular.toJson(param, true);
+		var json = encodeURI( angular.toJson( param, false));
 		$http.get( '?page=custompage_ping&action=saveprops&jsonparam='+json )
 				.success( function ( jsonResult ) {
 						console.log("history",jsonResult);

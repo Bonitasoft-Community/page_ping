@@ -40,13 +40,12 @@ import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 
-import com.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.api.TenantAPIAccessor;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
-import com.bonitasoft.engine.api.PlatformMonitoringAPI;
-import com.bonitasoft.users.UsersOperation;
+
 
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -63,6 +62,10 @@ import org.bonitasoft.engine.command.CommandCriterion;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 
+import org.bonitasoft.engine.identity.UserSearchDescriptor;
+import org.bonitasoft.engine.search.Order;
+
+
 import org.bonitasoft.log.event.BEvent;
 import org.bonitasoft.log.event.BEvent.Level;
 import org.bonitasoft.log.event.BEventFactory;
@@ -70,6 +73,8 @@ import org.bonitasoft.log.event.BEventFactory;
 import org.bonitasoft.ext.properties.BonitaProperties;
 	
 import com.bonitasoft.users.UsersOperation;
+
+
  
 public class Index implements PageController {
 
@@ -86,6 +91,12 @@ public class Index implements PageController {
 			PrintWriter out = response.getWriter()
 
 			String action=request.getParameter("action");
+			 
+			String jsonParamEncode = request.getParameter("jsonparam");
+            String jsonParamSt = (jsonParamEncode==null ? null : java.net.URLDecoder.decode(jsonParamEncode, "UTF-8"));
+            Object jsonParam = (jsonParamSt==null ? null : JSONValue.parse(jsonParamSt));
+           
+			
 			logger.info("###################################### action is["+action+"] 2.0!");
 			if (action==null || action.length()==0 )
 			{
@@ -97,8 +108,8 @@ public class Index implements PageController {
 			
 			APISession session = pageContext.getApiSession()
 			ProcessAPI processAPI = TenantAPIAccessor.getProcessAPI(session);
-			PlatformMonitoringAPI platformMonitoringAPI = TenantAPIAccessor.getPlatformMonitoringAPI(session);
-			IdentityAPI identityApi = TenantAPIAccessor.getIdentityAPI(session);
+
+			IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
 			
 			HashMap<String,Object> answer = null;
 			List<BEvent> listEvents = new ArrayList<BEvent>();
@@ -139,7 +150,7 @@ public class Index implements PageController {
 				answer.put("listprocesses", listProcesses);
 	
                 final UsersOperation userOperations = new UsersOperation();
-                final List<Map<String, Object>> listMapUsers = userOperations.getUsersList(identityApi);
+                final List<Map<String, Object>> listMapUsers = userOperations.getUsersList(identityAPI);
                 answer.put("listusers", listMapUsers);
                 
 				
@@ -149,8 +160,32 @@ public class Index implements PageController {
 				
 						
 			}
-			if ("saveprops".equals(action))	{
-				String jsonparam=request.getParameter("jsonparam");
+			else if ("queryusers".equals(action))
+            {
+                answer = new HashMap<String,Object>();
+				
+				List listUsers = new ArrayList();
+				final SearchOptionsBuilder searchOptionBuilder = new SearchOptionsBuilder(0, 100000);
+           		// http://documentation.bonitasoft.com/?page=using-list-and-search-methods
+            	searchOptionBuilder.filter(UserSearchDescriptor.ENABLED, Boolean.TRUE);
+            	searchOptionBuilder.searchTerm( jsonParam.get("userfilter") );
+
+            	searchOptionBuilder.sort(UserSearchDescriptor.LAST_NAME, Order.ASC);
+            	searchOptionBuilder.sort(UserSearchDescriptor.FIRST_NAME, Order.ASC);
+            	final SearchResult<User> searchResult = identityAPI.searchUsers(searchOptionBuilder.done());
+            	for (final User user : searchResult.getResult())
+            	{
+                	final Map<String, Object> oneRecord = new HashMap<String, Object>();
+                // oneRecord.put("display", user.getFirstName()+" " + user.getLastName()  + " (" + user.getUserName() + ")");
+	                oneRecord.put("display", user.getLastName() + "," + user.getFirstName() + " (" + user.getUserName() + ")");
+    	            oneRecord.put("id", user.getId());
+    	            listUsers.add( oneRecord );
+    	        }
+                answer.put("listUsers", listUsers);
+
+            }	
+			else if ("saveprops".equals(action))	{
+				
 				final HashMap<String, Object>  jsonHash=null;
 				
 				if (jsonparam != null && jsonparam.length() > 0 ) {
