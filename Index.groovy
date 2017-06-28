@@ -72,7 +72,7 @@ import org.bonitasoft.log.event.BEventFactory;
 
 import org.bonitasoft.ext.properties.BonitaProperties;
 	
-import com.bonitasoft.users.UsersOperation;
+import org.bonitasoft.users.UsersOperation;
 
 
  
@@ -108,8 +108,7 @@ public class Index implements PageController {
 			
 			APISession session = pageContext.getApiSession()
 			ProcessAPI processAPI = TenantAPIAccessor.getProcessAPI(session);
-
-			IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
+			IdentityAPI identityApi = TenantAPIAccessor.getIdentityAPI(session);
 			
 			HashMap<String,Object> answer = null;
 			List<BEvent> listEvents = new ArrayList<BEvent>();
@@ -154,8 +153,8 @@ public class Index implements PageController {
                 answer.put("listusers", listMapUsers);
                 
 				
-				listEvents.add( new BEvent("com.bonitasoft.ping", 1, Level.INFO, listMapUsers.size()+" Users found", "Number of users found in the system"));
-				listEvents.add( new BEvent("com.bonitasoft.ping", 1, Level.APPLICATIONERROR, "Fake error", "This is not a real error", "No consequence", "don't call anybody"));
+				listEvents.add( new BEvent("org.bonitasoft.ping", 1, Level.INFO, listMapUsers.size()+" Users found", "Number of users found in the system"));
+				listEvents.add( new BEvent("org.bonitasoft.ping", 1, Level.APPLICATIONERROR, "Fake error", "This is not a real error", "No consequence", "don't call anybody"));
 				
 				
 						
@@ -205,11 +204,11 @@ public class Index implements PageController {
 					catch( Exception e )
 					{
 						logger.severe("Exception "+e.toString());
-						listEvents.add( new BEvent("com.bonitasoft.ping", 10, Level.APPLICATIONERROR, "Error using BonitaProperties", "Error :"+e.toString(), "Properties is not saved", "Check exception"));
+						listEvents.add( new BEvent("org.bonitasoft.ping", 10, Level.APPLICATIONERROR, "Error using BonitaProperties", "Error :"+e.toString(), "Properties is not saved", "Check exception"));
 					}
 				}
 				else
-					listEvents.add( new BEvent("com.bonitasoft.ping", 11, Level.APPLICATIONERROR, "JsonHash can't be decode", "the parameters in Json can't be decode", "Properties is not saved", "Check page"));
+					listEvents.add( new BEvent("org.bonitasoft.ping", 11, Level.APPLICATIONERROR, "JsonHash can't be decode", "the parameters in Json can't be decode", "Properties is not saved", "Check page"));
 
 			}
 			if ("loadprops".equals(action)) {
@@ -230,7 +229,7 @@ public class Index implements PageController {
 				catch( Exception e )
 				{
 					logger.severe("Exception "+e.toString());
-					listEvents.add( new BEvent("com.bonitasoft.ping", 10, Level.APPLICATIONERROR, "Error using BonitaProperties", "Error :"+e.toString(), "Properties is not saved", "Check exception"));
+					listEvents.add( new BEvent("org.bonitasoft.ping", 10, Level.APPLICATIONERROR, "Error using BonitaProperties", "Error :"+e.toString(), "Properties is not saved", "Check exception"));
 
 				}
 
