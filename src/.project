@@ -22,19 +22,19 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>custompage/7.2.0 AITraining/Index.groovy</name>
+			<name>custompage/7.2.4/Index.groovy</name>
 			<type>1</type>
-			<location>C:/atelier/BPM-SP-7.2.0/workspace/AI Training/bonita_home/client/tenants/1/work/pages/custompage_ping/Index.groovy</location>
+			<locationURI>PARENT-5-PROJECT_LOC/bonita/BPM-SP-7.5.4/workspace/tomcat/server/temp/bonita_portal_4836@Dragon-Pierre-Yves/tenants/1/pages/custompage_ping/Index.groovy</locationURI>
 		</link>
 		<link>
-			<name>custompage/7.2.0 AITraining/index.html</name>
+			<name>custompage/7.2.4/index.html</name>
 			<type>1</type>
-			<location>C:/atelier/BPM-SP-7.2.0/workspace/AI Training/bonita_home/client/tenants/1/work/pages/custompage_ping/index.html</location>
+			<locationURI>PARENT-5-PROJECT_LOC/bonita/BPM-SP-7.5.4/workspace/tomcat/server/temp/bonita_portal_4836@Dragon-Pierre-Yves/tenants/1/pages/custompage_ping/index.html</locationURI>
 		</link>
 		<link>
-			<name>custompage/7.2.0 AITraining/pingmonitor.js</name>
+			<name>custompage/7.2.4/pingmonitor.js</name>
 			<type>1</type>
-			<location>C:/atelier/BPM-SP-7.2.0/workspace/AI Training/bonita_home/client/tenants/1/work/pages/custompage_ping/resources/pingmonitor.js</location>
+			<locationURI>PARENT-5-PROJECT_LOC/bonita/BPM-SP-7.5.4/workspace/tomcat/server/temp/bonita_portal_4836@Dragon-Pierre-Yves/tenants/1/pages/custompage_ping/resources/pingmonitor.js</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
