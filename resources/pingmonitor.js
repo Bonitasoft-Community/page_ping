@@ -81,18 +81,22 @@ appCommand.controller('PingControler',
 		
 		self.autocomplete.inprogress=true;
 		self.autocomplete.search = searchText;
- 
+		self.inprogress=true;
+		
 		var param={ 'userfilter' :  self.autocomplete.search};
 		
-		
 		var json = encodeURI( angular.toJson( param, false));
+		// 7.6 : the server force a cache on all URL, so to bypass the cache, then create a different URL
+		var d = new Date();
 		
-		return $http.get( '?page=custompage_ping&action=queryusers&jsonparam='+json )
+		return $http.get( '?page=custompage_ping&action=queryusers&paramjson='+json+'&t='+d.getTime() )
 		.then( function ( jsonResult ) {
 			console.log("QueryUser HTTP SUCCESS.1 - result= "+angular.toJson(jsonResult, false));
 				self.autocomplete.inprogress=false;
 			 	self.autocomplete.listUsers =  jsonResult.data.listUsers;
 				console.log("QueryUser HTTP SUCCESS length="+self.autocomplete.listUsers.length);
+				self.inprogress=false;
+		
 				return self.autocomplete.listUsers;
 				},  function ( jsonResult ) {
 				console.log("QueryUser HTTP THEN");
@@ -133,13 +137,20 @@ appCommand.controller('PingControler',
 	this.propsFirstName='';
 	this.saveProps = function() {
 		var self=this;
+		self.inprogress=true;
+		
 		var param={ 'firstname': this.propsFirstName };
-					  
 		var json = encodeURI( angular.toJson( param, false));
-		$http.get( '?page=custompage_ping&action=saveprops&jsonparam='+json )
+		
+		// 7.6 : the server force a cache on all URL, so to bypass the cache, then create a different URL
+		var d = new Date();
+		
+		$http.get( '?page=custompage_ping&action=saveprops&paramjson='+json +'&t='+d.getTime())
 				.success( function ( jsonResult ) {
 						console.log("history",jsonResult);
 						self.listevents		= jsonResult.listevents;
+						self.inprogress=false;
+		
 						alert('Properties saved');
 				})
 				.error( function() {
@@ -149,12 +160,18 @@ appCommand.controller('PingControler',
 	
 	this.loadProps =function() {
 		var self=this;
-		$http.get( '?page=custompage_ping&action=loadprops' )
+		self.inprogress=true;
+		
+		// 7.6 : the server force a cache on all URL, so to bypass the cache, then create a different URL
+		var d = new Date();
+		
+		$http.get( '?page=custompage_ping&action=loadprops&t='+d.getTime() )
 				.success( function ( jsonResult ) {
 						console.log("history",jsonResult);
 						self.propsFirstName = jsonResult.firstname;
 						self.listevents		= jsonResult.listevents;
-
+						self.inprogress		= false;
+		
 				})
 				.error( function() {
 					alert('an error occure');
