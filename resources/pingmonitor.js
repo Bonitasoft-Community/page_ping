@@ -44,8 +44,10 @@ appCommand.controller('PingControler',
 		
 		var self=this;
 		self.inprogress=true;
+		// 7.6 : the server force a cache on all URL, so to bypass the cache, then create a different URL
+		var d = new Date();
 		
-		$http.get( '?page=custompage_ping&action=ping' )
+		$http.get( '?page=custompage_ping&action=ping&t='+d.getTime() )
 				.success( function ( jsonResult ) {
 						console.log("history",jsonResult);
 						self.pingdate 		= jsonResult.pingcurrentdate;

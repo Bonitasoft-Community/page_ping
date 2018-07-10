@@ -1,0 +1,278 @@
+import java.lang.management.RuntimeMXBean;
+import java.lang.management.ManagementFactory;
+
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import java.text.SimpleDateFormat;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.List;
+import java.util.logging.Logger;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.lang.Runtime;
+
+import org.json.simple.JSONObject;
+import org.codehaus.groovy.tools.shell.CommandAlias;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONValue;
+
+
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.Statement;
+import javax.sql.DataSource;
+import java.sql.DatabaseMetaData;
+import java.sql.Clob;
+import java.util.Date;
+
+import org.apache.commons.lang3.StringEscapeUtils
+
+
+import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.service.TenantServiceSingleton
+import org.bonitasoft.console.common.server.page.PageContext
+import org.bonitasoft.console.common.server.page.PageController
+import org.bonitasoft.console.common.server.page.PageResourceProvider
+import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.CreationException;
+import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.ServerAPIException;
+import org.bonitasoft.engine.exception.UnknownAPITypeException;
+import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
+
+import org.bonitasoft.engine.api.TenantAPIAccessor;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
+import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
+import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
+import org.bonitasoft.engine.business.data.BusinessDataRepository
+import org.bonitasoft.engine.session.APISession;
+import org.bonitasoft.engine.api.ProcessAPI;
+
+import org.bonitasoft.log.event.BEvent;
+import org.bonitasoft.log.event.BEventFactory;
+import org.bonitasoft.log.event.BEvent.Level;
+
+
+import org.bonitasoft.custompage.noonrover.NoonRoverAccessAPI;
+import org.bonitasoft.custompage.noonrover.NoonRoverAccessAPI.ParameterSource;
+import org.bonitasoft.custompage.noonrover.NoonRoverAccessAPI.ParameterSource.TYPEOUTPUT
+import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.TenantServiceSingleton;
+
+
+public class Actions {
+
+    private static Logger logger= Logger.getLogger("org.bonitasoft.custompage.longboard.groovy");
+    
+    private static BEvent eventGetSteEvents = new BEvent("com.edf.cockpitste", 1, Level.ERROR, 
+            "Error during loading STE event", "Check Exception to see the cause",
+            "The properties will not work (no read, no save)", "Check Exception");
+    private final static BEvent eventCancelCaseError = new BEvent("com.edf.cockpitste", 2, Level.ERROR, "Erreur d'archive du case", "Une erreur est arrivée durant l'archivage du case", "Le case est toujours actif", "Vérifier l'erreur");
+    private final static BEvent eventCancelCaseWithSuccess = new BEvent("com.edf.cockpitste", 3, Level.SUCCESS, "Le case est archivé", "Le cas a été archivé avec succés");
+    private final static BEvent eventProcessNotFound = new BEvent("com.edf.cockpitste", 4, Level.ERROR, "Process non trouvé", "Un processus particulier est recherché, et il n'est pas déployé sur votre plateforme", "Aucun cas ne peut être crée", "Deployez le processus");
+    private final static BEvent eventTransfertRexSubmited = new BEvent("com.edf.cockpitste", 5, Level.SUCCESS, "Requête REX envoyée", "Les requêtes ont été soumises au SI REX");
+    private final static BEvent eventErreurRequeteREX = new BEvent("com.edf.cockpitste", 6, Level.ERROR, "Erreur lors de la soumission des requêtes", "Erreur", "Le cas n'est pas crée", "Vérifier l'erreur");
+    
+        
+    
+      // 2018-03-08T00:19:15.04Z
+    public final static SimpleDateFormat sdfJson = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    public final static SimpleDateFormat sdfHuman = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    /* -------------------------------------------------------------------- */
+    /*                                                                      */
+    /* doAction */
+    /*                                                                      */
+    /* -------------------------------------------------------------------- */
+
+    public static Index.ActionAnswer doAction(HttpServletRequest request, String paramJsonSt, HttpServletResponse response, PageResourceProvider pageResourceProvider, PageContext pageContext) {
+                
+        // logger.info("#### PingActions:Actions start");
+        Index.ActionAnswer actionAnswer = new Index.ActionAnswer(); 
+        List<BEvent> listEvents=new ArrayList<BEvent>();
+        
+        try {
+            String action=request.getParameter("action");
+            logger.info("#### log:Actions  action is["+action+"] !");
+            if (action==null || action.length()==0 )
+            {
+                actionAnswer.isManaged=false;
+                logger.info("#### log:Actions END No Actions");
+                return actionAnswer;
+            }
+            actionAnswer.isManaged=true;
+            
+            APISession apiSession = pageContext.getApiSession();
+            HttpSession httpSession = request.getSession();            
+            ProcessAPI processAPI = TenantAPIAccessor.getProcessAPI(apiSession);
+            
+            long tenantId = apiSession.getTenantId();          
+            TenantServiceAccessor tenantServiceAccessor = TenantServiceSingleton.getInstance(tenantId);             
+
+                
+           	
+			if ("ping".equals(action))
+			{
+				answer = new HashMap<String,Object>();
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				answer.put("pingcurrentdate", sdf.format( new Date() ) );
+				answer.put("pingserverinfo", "server is up 2.1");
+				
+				List<ActivityTimeLine> listActivities = new  ArrayList<ActivityTimeLine>();
+				listActivities.add( ActivityTimeLine.getActivityTimeLine("Choose beverage", 9, 11));
+				listActivities.add( ActivityTimeLine.getActivityTimeLine("Place Tea bag", 11, 12));
+				listActivities.add( ActivityTimeLine.getActivityTimeLine("Fill Hot Water", 12, 14));
+				listActivities.add( ActivityTimeLine.getActivityTimeLine("Insert Capsule", 11, 13));
+				listActivities.add( ActivityTimeLine.getActivityTimeLine("Inject hot water", 13, 14));
+				listActivities.add( ActivityTimeLine.getActivityTimeLine("Have fun with Bonita", 14, 17));
+				
+				answer.put("chartObject", getChartTimeLine("Chart Example", listActivities));
+				
+				
+				// list of process
+				SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+			
+				SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0,100);
+				SearchResult<ProcessDeploymentInfo> searchResult = processAPI.searchProcessDeploymentInfos( searchOptionsBuilder.done());
+				ArrayList<HashMap<String,Object>> listProcesses = new ArrayList<HashMap<String,Object>>();
+				for (ProcessDeploymentInfo processDeployment : searchResult.getResult())
+				{
+					HashMap<String,Object> processMap = new HashMap<String,Object>();
+					processMap.put("name", processDeployment.getName() );
+					processMap.put("version", processDeployment.getVersion() );
+					processMap.put("state", processDeployment.getConfigurationState().toString() );
+					processMap.put("deployeddate", simpleDateFormat.format( processDeployment.getDeploymentDate() ) );
+					listProcesses.add( processMap);
+				}
+				answer.put("listprocesses", listProcesses);
+	
+                final UsersOperation userOperations = new UsersOperation();
+                final List<Map<String, Object>> listMapUsers = userOperations.getUsersList(identityAPI);
+                answer.put("listusers", listMapUsers);
+                
+				
+				listEvents.add( new BEvent("com.bonitasoft.ping", 1, Level.INFO, listMapUsers.size()+" Users found", "Number of users found in the system"));
+				listEvents.add( new BEvent("com.bonitasoft.ping", 1, Level.APPLICATIONERROR, "Fake error", "This is not a real error", "No consequence", "don't call anybody"));
+				
+				
+						
+			}
+			else if ("queryusers".equals(action))
+            {
+                answer = new HashMap<String,Object>();
+				
+				List listUsers = new ArrayList();
+				final SearchOptionsBuilder searchOptionBuilder = new SearchOptionsBuilder(0, 100000);
+           		// http://documentation.bonitasoft.com/?page=using-list-and-search-methods
+            	searchOptionBuilder.filter(UserSearchDescriptor.ENABLED, Boolean.TRUE);
+            	searchOptionBuilder.searchTerm( jsonParam.get("userfilter") );
+
+            	searchOptionBuilder.sort(UserSearchDescriptor.LAST_NAME, Order.ASC);
+            	searchOptionBuilder.sort(UserSearchDescriptor.FIRST_NAME, Order.ASC);
+            	final SearchResult<User> searchResult = identityAPI.searchUsers(searchOptionBuilder.done());
+            	for (final User user : searchResult.getResult())
+            	{
+                	final Map<String, Object> oneRecord = new HashMap<String, Object>();
+                // oneRecord.put("display", user.getFirstName()+" " + user.getLastName()  + " (" + user.getUserName() + ")");
+	                oneRecord.put("display", user.getLastName() + "," + user.getFirstName() + " (" + user.getUserName() + ")");
+    	            oneRecord.put("id", user.getId());
+    	            listUsers.add( oneRecord );
+    	        }
+                answer.put("listUsers", listUsers);
+
+            }	
+			else if ("saveprops".equals(action))	{
+				
+				final HashMap<String, Object>  jsonHash=null;
+				
+				if (jsonparam != null && jsonparam.length() > 0 ) {
+					jsonHash = (HashMap<String, Object>) JSONValue.parse( jsonparam );
+				}
+				answer = new HashMap<String,Object>();
+				if (jsonHash!=null)
+				{
+					try
+					{
+						BonitaProperties bonitaProperties = new BonitaProperties( pageResourceProvider );
+
+						listEvents.addAll( bonitaProperties.load() );
+						bonitaProperties.setProperty( session.getUserId()+"_firstname", jsonHash.get("firstname") );
+						listEvents.addAll(  bonitaProperties.store());
+					}
+					catch( Exception e )
+					{
+						logger.severe("Exception "+e.toString());
+						listEvents.add( new BEvent("com.bonitasoft.ping", 10, Level.APPLICATIONERROR, "Error using BonitaProperties", "Error :"+e.toString(), "Properties is not saved", "Check exception"));
+					}
+				}
+				else
+					listEvents.add( new BEvent("com.bonitasoft.ping", 11, Level.APPLICATIONERROR, "JsonHash can't be decode", "the parameters in Json can't be decode", "Properties is not saved", "Check page"));
+
+			}
+			if ("loadprops".equals(action)) {
+				answer = new HashMap<String,Object>();
+				try
+				{
+					logger.info("Load properties");
+
+					BonitaProperties bonitaProperties = new BonitaProperties( pageResourceProvider );
+					listEvents.addAll( bonitaProperties.load() );
+					logger.info("Load done, events = "+listEvents.size() );
+
+					String firstName = bonitaProperties.getProperty( session.getUserId()+"_firstname" );
+					logger.info("Load done, firstName["+firstName+"]" );
+					answer.put("firstname", (firstName==null ? "" : firstName) );
+		
+				}
+				catch( Exception e )
+				{
+					logger.severe("Exception "+e.toString());
+					listEvents.add( new BEvent("com.bonitasoft.ping", 10, Level.APPLICATIONERROR, "Error using BonitaProperties", "Error :"+e.toString(), "Properties is not saved", "Check exception"));
+
+				}
+
+			}
+             
+            // actionAnswer.responseMap.put("listevents",BEventFactory.getHtml( listEvents));
+                
+            
+            logger.info("#### log:Actions END responseMap ="+actionAnswer.responseMap.size());
+            return actionAnswer;
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            String exceptionDetails = sw.toString();
+            logger.severe("#### log:Groovy Exception ["+e.toString()+"] at "+exceptionDetails);
+            actionAnswer.isResponseMap=true;
+            actionAnswer.responseMap.put("Error", "log:Groovy Exception ["+e.toString()+"] at "+exceptionDetails);
+            
+
+            
+            return actionAnswer;
+        }
+    }
+
+    
+    
+    
+    
+}

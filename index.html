@@ -45,6 +45,8 @@
 		
 </head>
 <body ng-app="pingmonitor">
+<!-- Show the directory currently used - remove it on a production server to not display the internal disk structure -->
+<!--  Page Directory: @_PAGEDIRECTORY_@ -->
 
 <h1><center>Ping the server</center></h1>
 
@@ -220,7 +222,8 @@
   
 
 <!-- Application dependencies -->
-<script src="pageResource?page=custompage_ping&location=pingmonitor.js"></script>
+<!-- to be sure to reload every time the JS file, add this marker -->
+<script src="pageResource?page=custompage_ping&location=pingmonitor.js&t=@_CURRENTTIMEMILIS_@"></script>
 
 
 <script type="text/javascript" src="https://cdn.jsdelivr.net/alasql/0.3/alasql.min.js"></script>

@@ -20,4 +20,21 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.eclipse.m2e.core.maven2Nature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>custompage/community/Index.groovy</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Index.groovy</locationURI>
+		</link>
+		<link>
+			<name>custompage/community/index.html</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/index.html</locationURI>
+		</link>
+		<link>
+			<name>custompage/community/pingmonitor.js</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/resources/pingmonitor.js</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>
