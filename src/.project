@@ -22,6 +22,26 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>custompage/00 Git/Actions.groovy</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Actions.groovy</locationURI>
+		</link>
+		<link>
+			<name>custompage/00 Git/Index.groovy</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Index.groovy</locationURI>
+		</link>
+		<link>
+			<name>custompage/00 Git/index.html</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/index.html</locationURI>
+		</link>
+		<link>
+			<name>custompage/00 Git/pingmonitor.js</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/resources/pingmonitor.js</locationURI>
+		</link>
+		<link>
 			<name>custompage/community/Index.groovy</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Index.groovy</locationURI>
