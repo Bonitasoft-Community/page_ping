@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
- 	<properties>
-    	 <ping.version>2.4.0</ping.version>
-  	</properties>
+	<properties>
+		<!-- <ping.version>2.4.0</ping.version> -->
+	</properties>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.bonitasoft.custompage</groupId>
 	<artifactId>CustomPagePing</artifactId>
-	<version>${ping.version}</version>
+	<version>2.4.0</version>
 	<dependencies>
 		<dependency>
 			<groupId>org.bonitasoft.engine</groupId>
@@ -22,8 +22,16 @@
 			<artifactId>bonita-properties</artifactId>
 			<version>2.1.0</version>
 		</dependency>
+		
+		<!--  to execute the REST Plug in -->
+		 <dependency>
+            <groupId>org.codehaus.groovy.modules.http-builder</groupId>
+            <artifactId>http-builder</artifactId>
+            <version>0.5.1</version>
+        </dependency>
 	</dependencies>
 
+	<!-- ******************** Community Maven repository **************** -->
 	<repositories>
 		<repository>
 			<releases>
@@ -92,7 +100,7 @@
 				</executions>
 			</plugin>
 
-			<!-- ******************** Generate the Ressource (ZIP FILE) -->
+			<!-- ******************** Generate the Resource (ZIP FILE) -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -118,7 +126,50 @@
 				</executions>
 			</plugin>
 
+			<!-- *************** deploy the resource localy -->
+			<!-- https://www.esentri.com/deploy-to-oracle-application-container-cloud-using-maven/ -->
+			<!-- https://stackoverflow.com/questions/7551711/maven-plugin-to-call-or-invoke-a-rest-web-service -->
+			
+			<!--  to call 
+				POST http://localhost:62806/bonita/portal/pageUpload?action=add 
+					payload: file in the post name:<name> file:<binary>
+					return tmp_3067944624225362733.zip::custompagePing-2.4.0.zip::[]
+				POST http://localhost:62806/bonita/API/portal/page
+				    payload: { pageZip: "tmp_3067944624225362733.zip::custompagePing-2.4.0.zip", formError: ""}
+			 -->
+			 <!-- 
+			<plugin>
+                <groupId>org.codehaus.groovy.maven</groupId>
+                <artifactId>gmaven-plugin</artifactId>
+                <version>1.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>deploy</goal>
+                      </goals>
+                       <configuration>
+                          <source>
+                            import groovyx.net.http.RESTClient
+                            import groovy.util.slurpersupport.GPathResult
+                            import static groovyx.net.http.ContentType.XML
 
+                            solr = new RESTClient('http://localhost:62806/bonita/portal/pageUpload?action=add')
+
+                            def response = solr.post(
+                                contentType: XML,
+                                requestContentType: XML,
+                                body: {
+                                    
+                                }
+                            )
+                            log.info "Solr response status: ${response.status}"
+                         </source>
+                     </configuration>
+                 </execution>
+              </executions>         
+			</plugin>
+			 -->
 		</plugins>
 	</build>
 </project>
