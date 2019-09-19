@@ -157,7 +157,7 @@
 								<argument>bonita</argument>
 								<argument>Walter.Bates</argument>
 								<argument>bpm</argument>
-								<argument>target/custompagePing-2.4.0.zip</argument>
+								<argument>target/custompagePing-${project.version}.zip</argument>
 								<!-- use UPDATE or DELETEANDADD -->
 								<argument>UPDATE</argument>
 							</arguments>
