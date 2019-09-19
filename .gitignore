@@ -29,3 +29,9 @@ release/2.2/custompage_ping.zip
 release/2.3/custompage_ping.zip
 
 resources/img/UniversityOfAuckland.jpg
+
+lib/bonita-client-7.8.4.jar
+
+lib/bonita-server-7.8.4.jar
+
+lib/bonita-store-1.0.0.jar

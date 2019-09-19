@@ -10,7 +10,7 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine</groupId>
 			<artifactId>bonita-server</artifactId>
-			<version>7.1.5</version>
+			<version>7.8.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.log.event</groupId>
@@ -22,13 +22,19 @@
 			<artifactId>bonita-properties</artifactId>
 			<version>2.1.0</version>
 		</dependency>
+
+		<!-- to execute the REST Plug in -->
+					<dependency>
+						<groupId>org.bonitasoft.store</groupId>
+						<artifactId>bonita-store</artifactId>
+						<version>1.0.0</version>
+					</dependency>
+				<dependency>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-client</artifactId>
+			<version>7.8.4</version>
+		</dependency>
 		
-		<!--  to execute the REST Plug in -->
-		 <dependency>
-            <groupId>org.codehaus.groovy.modules.http-builder</groupId>
-            <artifactId>http-builder</artifactId>
-            <version>0.5.1</version>
-        </dependency>
 	</dependencies>
 
 	<!-- ******************** Community Maven repository **************** -->
@@ -127,87 +133,37 @@
 			</plugin>
 
 			<!-- *************** deploy the resource localy -->
-			<!-- https://www.esentri.com/deploy-to-oracle-application-container-cloud-using-maven/ -->
-			<!-- https://stackoverflow.com/questions/7551711/maven-plugin-to-call-or-invoke-a-rest-web-service -->
-			
-			<!--  to call 
-				POST http://localhost:62806/bonita/portal/pageUpload?action=add 
-					payload: file in the post name:<name> file:<binary>
-					return tmp_3067944624225362733.zip::custompagePing-2.4.0.zip::[]
-				POST http://localhost:62806/bonita/API/portal/page
-				    payload: { pageZip: "tmp_3067944624225362733.zip::custompagePing-2.4.0.zip", formError: ""}
-			 -->
-			 
+
 			<plugin>
-                <groupId>org.codehaus.groovy.maven</groupId>
-                <artifactId>gmaven-plugin</artifactId>
-                <version>1.0</version>
-                <dependencies>
-					<dependency>
-					    <groupId>org.bonitasoft.store</groupId>
-					    <artifactId>bonita-store</artifactId>
-					    <version>1.0.0</version>
-					</dependency>
-					
-					<!--  
-
-					<dependency>
-					    <groupId>org.codehaus.groovy.maven.runtime</groupId>
-					    <artifactId>gmaven-runtime-support</artifactId>
-					    <version>1.0</version>
-					</dependency>
-					
-					
-					<dependency>
-		                <groupId>org.codehaus.gmaven</groupId>
-		                <artifactId>groovy-maven-plugin</artifactId>
-		                <version>2.0</version>
-		            </dependency>
-		            -->
-                </dependencies>
-                <executions>
-                    <execution>
-                    	<id>Deploy to Bonita Server</id>						
-                        <phase>package</phase>
-                        <goals>
-                            <goal>execute</goal>
-                      </goals>
-                       <configuration>
-                       <!-- 
-    					<sourceX>2.0</source>
-    					 -->
-                          <source>
-							import java.io.File;
-							
-                       		 System.out.println("Start deploy");
-                       		 
-					        </source>
-					        <!-- <source2>    
-							import java.io.File;
-							import org.bonitasoft.store.BonitaAccessorClient;
-
-							
-							 try {
-					            System.out.println("Start deploy");
-					            BonitaAccessorClient bonitaAccessorClient = new BonitaAccessorClient();
-					            bonitaAccessorClient.login( "http://localhost:62806", "bonita", "Walter.Bates", "bpm" );
-					            
-					            File fileCustom = new File("target/custompagePing-2.4.0.zip");
-					            bonitaAccessorClient.deployArtefact( fileCustom );
-					            
-					
-					            System.out.println("Deploy done");
-					
-					        } catch (Exception e) {
-					            System.out.println("Exception " + e.toString());
-					        }
-                         </source2>
--->
-                     </configuration>
-                 </execution>
-              </executions>         
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.1.1</version>
+				
+				<executions>
+					<execution>
+						<id>Deploy Java to Bonita Server</id>
+						
+						<phase>test</phase>
+						<goals>
+							<goal>java</goal>
+						</goals>
+						<configuration>
+							<mainClass>org.bonitasoft.store.BonitaStoreAccessorClient</mainClass>
+							<arguments>
+								<argument>http://localhost:25920</argument>
+								<argument>bonita</argument>
+								<argument>Walter.Bates</argument>
+								<argument>bpm</argument>
+								<argument>target/custompagePing-2.4.0.zip</argument>
+								<!--  use UPDATE or DELETEANDADD -->
+								<argument>DELETEANDADD</argument>
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
-			 
+
+
 		</plugins>
 	</build>
 </project>
