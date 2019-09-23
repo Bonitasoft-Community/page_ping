@@ -88,8 +88,8 @@
 							<outputDirectory>${basedir}/lib</outputDirectory>
 							<artifactItems>
 								<artifactItem>
-									<groupId>org.bonitasoft.custompage</groupId>
-									<artifactId>CustomPagePing</artifactId>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>${project.artifactId}</artifactId>
 									<version>${project.version}</version>
 									<overWrite>true</overWrite>
 								</artifactItem>
@@ -124,7 +124,7 @@
 						</goals>
 						<inherited>false</inherited>
 						<configuration>
-							<finalName>custompagePing-${project.version}</finalName>
+							<finalName>${project.artifactId}-${project.version}</finalName>
 							<ignoreDirFormatExtensions>true</ignoreDirFormatExtensions>
 							<appendAssemblyId>false</appendAssemblyId>
 							<descriptors>
@@ -136,7 +136,6 @@
 			</plugin>
 
 			<!-- *************** deploy the resource localy -->
-
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
@@ -146,7 +145,7 @@
 					<execution>
 						<id>Deploy Java to Bonita Server</id>
 
-						<phase>test</phase>
+						<phase>install</phase>
 						<goals>
 							<goal>java</goal>
 						</goals>
@@ -157,15 +156,14 @@
 								<argument>bonita</argument>
 								<argument>Walter.Bates</argument>
 								<argument>bpm</argument>
-								<argument>target/custompagePing-${project.version}.zip</argument>
+								<argument>target/${project.artifactId}-${project.version}.zip</argument>
 								<!-- use UPDATE or DELETEANDADD -->
-								<argument>UPDATE</argument>
+								<argument>strategy:UPDATE</argument>
 							</arguments>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
-
 
 		</plugins>
 	</build>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>CustomPagePing</name>
+	<name>page_ping</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -24,37 +24,43 @@
 		<link>
 			<name>custompage/00 Git/Actions.groovy</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Actions.groovy</locationURI>
+			<locationURI>copy_PARENT/Actions.groovy</locationURI>
 		</link>
 		<link>
 			<name>custompage/00 Git/Index.groovy</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Index.groovy</locationURI>
+			<locationURI>copy_PARENT/Index.groovy</locationURI>
 		</link>
 		<link>
 			<name>custompage/00 Git/index.html</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/index.html</locationURI>
+			<locationURI>copy_PARENT/index.html</locationURI>
 		</link>
 		<link>
 			<name>custompage/00 Git/pingmonitor.js</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/resources/pingmonitor.js</locationURI>
+			<locationURI>copy_PARENT/resources/pingmonitor.js</locationURI>
 		</link>
 		<link>
 			<name>custompage/community/Index.groovy</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Index.groovy</locationURI>
+			<locationURI>copy_PARENT/Index.groovy</locationURI>
 		</link>
 		<link>
 			<name>custompage/community/index.html</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/index.html</locationURI>
+			<locationURI>copy_PARENT/index.html</locationURI>
 		</link>
 		<link>
 			<name>custompage/community/pingmonitor.js</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/resources/pingmonitor.js</locationURI>
+			<locationURI>copy_PARENT/resources/pingmonitor.js</locationURI>
 		</link>
 	</linkedResources>
+	<variableList>
+		<variable>
+			<name>copy_PARENT</name>
+			<value>$%7BPARENT-2-PROJECT_LOC%7D/git/bonita-community</value>
+		</variable>
+	</variableList>
 </projectDescription>
