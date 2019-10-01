@@ -143,7 +143,7 @@
 
 				<executions>
 					<execution>
-						<id>Deploy Java to Bonita Server</id>
+						<id>Deploy Page to Bonita Server</id>
 
 						<phase>install</phase>
 						<goals>
