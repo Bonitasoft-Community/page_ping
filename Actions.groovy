@@ -83,7 +83,10 @@ import org.bonitasoft.log.event.BEvent.Level;
 import org.bonitasoft.log.event.BEventFactory;
 
 import org.bonitasoft.properties.BonitaProperties;
-
+import org.bonitasoft.search.ContactDataSearchDescriptorRelation
+import org.bonitasoft.search.ProcessDeploymentInfoSearchDescriptorRelation
+import org.bonitasoft.search.SearchRelationAPI
+import org.bonitasoft.search.options.SearchOptionsBuilderRelation
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 
@@ -94,16 +97,10 @@ public class Actions {
 
     private static Logger logger= Logger.getLogger("org.bonitasoft.custompage.longboard.groovy");
     
-    private static BEvent eventGetSteEvents = new BEvent("com.edf.cockpitste", 1, Level.ERROR, 
-            "Error during loading STE event", "Check Exception to see the cause",
-            "The properties will not work (no read, no save)", "Check Exception");
-    private final static BEvent eventCancelCaseError = new BEvent("com.edf.cockpitste", 2, Level.ERROR, "Erreur d'archive du case", "Une erreur est arrivée durant l'archivage du case", "Le case est toujours actif", "Vérifier l'erreur");
-    private final static BEvent eventCancelCaseWithSuccess = new BEvent("com.edf.cockpitste", 3, Level.SUCCESS, "Le case est archivé", "Le cas a été archivé avec succés");
-    private final static BEvent eventProcessNotFound = new BEvent("com.edf.cockpitste", 4, Level.ERROR, "Process non trouvé", "Un processus particulier est recherché, et il n'est pas déployé sur votre plateforme", "Aucun cas ne peut être crée", "Deployez le processus");
-    private final static BEvent eventTransfertRexSubmited = new BEvent("com.edf.cockpitste", 5, Level.SUCCESS, "Requête REX envoyée", "Les requêtes ont été soumises au SI REX");
-    private final static BEvent eventErreurRequeteREX = new BEvent("com.edf.cockpitste", 6, Level.ERROR, "Erreur lors de la soumission des requêtes", "Erreur", "Le cas n'est pas crée", "Vérifier l'erreur");
     
-        
+    private static EVENT_USERS_FOUND = new BEvent("org.bonitasoft.custompage.ping", 1, Level.INFO, "Number of users found in the system", "", "", "");
+    private static EVENT_FAKE_ERROR  = new BEvent("com.bonitasoft.ping", 1, Level.APPLICATIONERROR, "Fake error", "This is not a real error", "No consequence", "don't call anybody");
+
     
       // 2018-03-08T00:19:15.04Z
     public final static SimpleDateFormat sdfJson = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -183,10 +180,10 @@ public class Actions {
                  actionAnswer.responseMap.put("listusers", listMapUsers);
                 
 				
-				listEvents.add( new BEvent("com.bonitasoft.ping", 1, Level.INFO, listMapUsers.size()+" Users found", "Number of users found in the system"));
-				listEvents.add( new BEvent("com.bonitasoft.ping", 1, Level.APPLICATIONERROR, "Fake error", "This is not a real error", "No consequence", "don't call anybody"));
+				listEvents.add( new BEvent(EVENT_USERS_FOUND, listMapUsers.size()+" Users found"));
+				listEvents.add( EVENT_FAKE_ERROR );
 				
-				
+				// testProcessStartedUserName( apiSession );
 						
 			}
 			else if ("queryusers".equals(action))
@@ -259,7 +256,7 @@ public class Actions {
 
 			}
              
-            // actionAnswer.responseMap.put("listevents",BEventFactory.getHtml( listEvents));
+            actionAnswer.responseMap.put("listevents",BEventFactory.getHtml( listEvents));
                 
             
             logger.info("#### log:Actions END responseMap ="+actionAnswer.responseMap.size());
@@ -373,6 +370,30 @@ public class Actions {
 				return valueChart;		
 		}
     
-    
-    
+		/**
+		 public static void testProcessStartedUserName( APISession apiSession ) {
+		     SearchRelationAPI searchRelation = new SearchRelationAPI( apiSession );
+                
+		     -- SearchOptionsBuilderRelation sob = new SearchOptionsBuilderRelation( 0,10);
+		        sob.filter(org.bonitasoft.search.UserSearchDescriptorRelation.USER_NAME, "Walter.Bates");
+		        sob.relation(org.bonitasoft.search.ProcessInstanceSearchDescriptorRelation.STARTED_BY);
+		       --
+		        SearchOptionsBuilderRelation sob = new SearchOptionsBuilderRelation(0,10);
+		        sob.filter(org.bonitasoft.search.ContactDataSearchDescriptorRelation.EMAIL, "Walter.Bates@bonitasoft.com");
+		        sob.filter(org.bonitasoft.search.ContactDataSearchDescriptorRelation.PERSONAL, Boolean.FALSE);
+		        
+		        // we don't have the filterRelation. So, here we give this kind of relation, saying "Please link the second table by the STARTEDBY
+		        sob.relation(org.bonitasoft.search.ProcessInstanceSearchDescriptorRelation.STARTED_BY);
+                sob.relation(org.bonitasoft.search.ProcessInstanceSearchDescriptorRelation.PROCESS_DEFINITION_ID);
+                sob.relation(org.bonitasoft.search.ContactDataSearchDescriptorRelation.USERID);
+		        sob.filter(org.bonitasoft.search.ProcessDeploymentInfoSearchDescriptorRelation.NAME, "TestProcess");
+		        try {
+		            searchRelation.search(ProcessInstance.class, sob.done());
+		        } catch (Exception e) {
+		            logger.severe("testProcessStartedUserName >"+e.getMessage()+"<");
+
+		        }
+		        
+		    }
+		    */
 }

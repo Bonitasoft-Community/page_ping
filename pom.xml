@@ -24,6 +24,14 @@
 			<version>2.1.0</version>
 		</dependency>
 
+<!-- 
+		<dependency>
+			<groupId>org.bonitasoft.search</groupId>
+  			<artifactId>BonitaSearchRelation</artifactId>
+  			<version>1.0.0</version>
+		</dependency>
+  -->
+ 
 		<!-- to execute the Deploy Plugin -->
 		<dependency>
 			<groupId>org.bonitasoft.store</groupId>
