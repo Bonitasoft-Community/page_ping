@@ -83,10 +83,6 @@ import org.bonitasoft.log.event.BEvent.Level;
 import org.bonitasoft.log.event.BEventFactory;
 
 import org.bonitasoft.properties.BonitaProperties;
-import org.bonitasoft.search.ContactDataSearchDescriptorRelation
-import org.bonitasoft.search.ProcessDeploymentInfoSearchDescriptorRelation
-import org.bonitasoft.search.SearchRelationAPI
-import org.bonitasoft.search.options.SearchOptionsBuilderRelation
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 
