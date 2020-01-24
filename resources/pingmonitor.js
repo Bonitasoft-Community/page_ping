@@ -48,17 +48,22 @@ appCommand.controller('PingControler',
 		var d = new Date();
 		
 		$http.get( '?page=custompage_ping&action=ping&t='+d.getTime() )
-				.success( function ( jsonResult ) {
-						console.log("history",jsonResult);
-						self.pingdate 		= jsonResult.pingcurrentdate;
-						self.pinginfo 		= jsonResult.pingserverinfo;
-						self.listprocesses	= jsonResult.listprocesses;
-						self.listusers		= jsonResult.listusers;
-						self.listevents		= jsonResult.listevents;
-						
-						$scope.chartObject		 	= JSON.parse(jsonResult.chartObject);
-		
-						self.inprogress=false;
+				.success( function ( jsonResult, statusHttp, headers, config ) {
+					// connection is lost ?
+					if (statusHttp==401 || typeof jsonResult === 'string') {
+						console.log("Redirected to the login page !");
+						window.location.reload();
+					}
+					console.log("history",jsonResult);
+					self.pingdate 		= jsonResult.pingcurrentdate;
+					self.pinginfo 		= jsonResult.pingserverinfo;
+					self.listprocesses	= jsonResult.listprocesses;
+					self.listusers		= jsonResult.listusers;
+					self.listevents		= jsonResult.listevents;
+					
+					$scope.chartObject		 	= JSON.parse(jsonResult.chartObject);
+	
+					self.inprogress=false;
 						
 						
 				})
@@ -90,16 +95,21 @@ appCommand.controller('PingControler',
 		var d = new Date();
 		
 		return $http.get( '?page=custompage_ping&action=queryusers&paramjson='+json+'&t='+d.getTime() )
-		.then( function ( jsonResult ) {
+		.then( function ( jsonResult, statusHttp, headers, config ) {
+			// connection is lost ?
+			if (statusHttp==401 || typeof jsonResult === 'string') {
+				console.log("Redirected to the login page !");
+				window.location.reload();
+			}
 			console.log("QueryUser HTTP SUCCESS.1 - result= "+angular.toJson(jsonResult, false));
-				self.autocomplete.inprogress=false;
-			 	self.autocomplete.listUsers =  jsonResult.data.listUsers;
-				console.log("QueryUser HTTP SUCCESS length="+self.autocomplete.listUsers.length);
-				self.inprogress=false;
-		
-				return self.autocomplete.listUsers;
-				},  function ( jsonResult ) {
-				console.log("QueryUser HTTP THEN");
+			self.autocomplete.inprogress=false;
+		 	self.autocomplete.listUsers =  jsonResult.data.listUsers;
+			console.log("QueryUser HTTP SUCCESS length="+self.autocomplete.listUsers.length);
+			self.inprogress=false;
+	
+			return self.autocomplete.listUsers;
+		},  function ( jsonResult ) {
+		console.log("QueryUser HTTP THEN");
 		});
 
 	  };
@@ -146,12 +156,17 @@ appCommand.controller('PingControler',
 		var d = new Date();
 		
 		$http.get( '?page=custompage_ping&action=saveprops&paramjson='+json +'&t='+d.getTime())
-				.success( function ( jsonResult ) {
-						console.log("history",jsonResult);
-						self.listevents		= jsonResult.listevents;
-						self.inprogress=false;
-		
-						alert('Properties saved');
+				.success( function ( jsonResult, statusHttp, headers, config ) {
+					// connection is lost ?
+					if (statusHttp==401 || typeof jsonResult === 'string') {
+						console.log("Redirected to the login page !");
+						window.location.reload();
+					}
+					console.log("history",jsonResult);
+					self.listevents		= jsonResult.listevents;
+					self.inprogress=false;
+	
+					alert('Properties saved');
 				})
 				.error( function() {
 					alert('an error occure');
@@ -166,11 +181,16 @@ appCommand.controller('PingControler',
 		var d = new Date();
 		
 		$http.get( '?page=custompage_ping&action=loadprops&t='+d.getTime() )
-				.success( function ( jsonResult ) {
-						console.log("history",jsonResult);
-						self.propsFirstName = jsonResult.firstname;
-						self.listevents		= jsonResult.listevents;
-						self.inprogress		= false;
+				.success( function ( jsonResult, statusHttp, headers, config ) {
+					// connection is lost ?
+					if (statusHttp==401 || typeof jsonResult === 'string') {
+						console.log("Redirected to the login page !");
+						window.location.reload();
+					}
+					console.log("history",jsonResult);
+					self.propsFirstName = jsonResult.firstname;
+					self.listevents		= jsonResult.listevents;
+					self.inprogress		= false;
 		
 				})
 				.error( function() {
