@@ -29,9 +29,11 @@ import java.sql.DatabaseMetaData;
 import org.apache.commons.lang3.StringEscapeUtils
  
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.console.common.server.page.PageContext
-import org.bonitasoft.console.common.server.page.PageController
-import org.bonitasoft.console.common.server.page.PageResourceProvider
+
+import org.bonitasoft.web.extension.page.PageContext;
+import org.bonitasoft.web.extension.page.PageController;
+import org.bonitasoft.web.extension.page.PageResourceProvider;
+
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -45,7 +47,7 @@ import org.bonitasoft.engine.session.APISession;
 
 public class Index implements PageController {
 
-	private static String pageName="ping";
+	private static String pageName="workshoptruck";
 	private static Logger loggerCustomPage= Logger.getLogger("org.bonitasoft.custompage."+pageName+".groovy");
 	
 	
@@ -213,7 +215,7 @@ public class Index implements PageController {
 				out.print(indexContent);
 				out.flush();
 				out.close();
-				loggerCustomPage.info("#### "+pageName+": return index.hml size("+indexContent.length+"]");
+				loggerCustomPage.info("#### "+pageName+": return index.hml size("+indexContent.length()+"]");
 				
 		} catch (Exception e) {
 			loggerCustomPage.severe("#### "+pageName+":Error "+e.toString());
