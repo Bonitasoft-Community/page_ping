@@ -136,7 +136,13 @@ public class Actions {
 			
             long tenantId = apiSession.getTenantId();          
             TenantServiceAccessor tenantServiceAccessor = TenantServiceSingleton.getInstance(tenantId);             
-
+            //Make sure no action is executed if the CSRF protection is active and the request header is invalid
+            if (! TokenValidator.checkCSRFToken(request, response)) {
+                logger.severe("#### log:Actions  Token Validator failed on action["+action+"] !");
+                actionAnswer.isResponseMap=false;
+                return actionAnswer;
+            }
+ 
                 
            	
 			if ("ping".equals(action))

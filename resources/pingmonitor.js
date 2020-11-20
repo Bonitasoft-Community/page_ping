@@ -6,7 +6,7 @@
 (function() {
 
 
-var appCommand = angular.module('pingmonitor', ['googlechart', 'ui.bootstrap','ngSanitize', 'ngModal', 'ngMaterial']);
+var appCommand = angular.module('pingmonitor', ['googlechart', 'ui.bootstrap','ngSanitize', 'ngModal', 'ngMaterial',  'toaster', 'ngCookies']);
 
 
 /* Material : for the autocomplete
@@ -30,12 +30,23 @@ var appCommand = angular.module('pingmonitor', ['googlechart', 'ui.bootstrap','n
 
 // Ping the server
 appCommand.controller('PingControler',
-	function ( $http, $scope,$sce,$filter ) {
+	function ( $http, $scope,$sce,$filter, toaster,$cookies ) {
 
 	this.pingdate='';
 	this.pinginfo='';
 	this.listevents='';
 	this.inprogress=false;
+	
+	this.getHttpConfig = function () {
+		var additionalHeaders = {};
+		var csrfToken = $cookies.get('X-Bonita-API-Token');
+		if (csrfToken) {
+			additionalHeaders ['X-Bonita-API-Token'] = csrfToken;
+		}
+		var config= {"headers": additionalHeaders};
+		console.log("GetHttpConfig : "+angular.toJson( config));
+		return config;
+	}
 	
 	this.ping = function()
 	{
@@ -47,7 +58,7 @@ appCommand.controller('PingControler',
 		// 7.6 : the server force a cache on all URL, so to bypass the cache, then create a different URL
 		var d = new Date();
 		
-		$http.get( '?page=custompage_ping&action=ping&t='+d.getTime() )
+		$http.get( '?page=custompage_ping&action=ping&t='+d.getTime(), this.getHttpConfig() )
 				.success( function ( jsonResult, statusHttp, headers, config ) {
 					// connection is lost ?
 					if (statusHttp==401 || typeof jsonResult === 'string') {
@@ -64,7 +75,8 @@ appCommand.controller('PingControler',
 					$scope.chartObject		 	= JSON.parse(jsonResult.chartObject);
 	
 					self.inprogress=false;
-						
+					toaster.pop('success', "Information received", "");
+					
 						
 				})
 				.error( function() {
@@ -94,7 +106,7 @@ appCommand.controller('PingControler',
 		// 7.6 : the server force a cache on all URL, so to bypass the cache, then create a different URL
 		var d = new Date();
 		
-		return $http.get( '?page=custompage_ping&action=queryusers&paramjson='+json+'&t='+d.getTime() )
+		return $http.get( '?page=custompage_ping&action=queryusers&paramjson='+json+'&t='+d.getTime(), this.getHttpConfig() )
 		.then( function ( jsonResult, statusHttp, headers, config ) {
 			// connection is lost ?
 			if (statusHttp==401 || typeof jsonResult === 'string') {
@@ -155,7 +167,7 @@ appCommand.controller('PingControler',
 		// 7.6 : the server force a cache on all URL, so to bypass the cache, then create a different URL
 		var d = new Date();
 		
-		$http.get( '?page=custompage_ping&action=saveprops&paramjson='+json +'&t='+d.getTime())
+		$http.get( '?page=custompage_ping&action=saveprops&paramjson='+json +'&t='+d.getTime(), this.getHttpConfig() )
 				.success( function ( jsonResult, statusHttp, headers, config ) {
 					// connection is lost ?
 					if (statusHttp==401 || typeof jsonResult === 'string') {
@@ -166,7 +178,9 @@ appCommand.controller('PingControler',
 					self.listevents		= jsonResult.listevents;
 					self.inprogress=false;
 	
-					alert('Properties saved');
+
+					toaster.pop('success', "Properties saved", "");
+					
 				})
 				.error( function() {
 					alert('an error occure');
@@ -180,7 +194,7 @@ appCommand.controller('PingControler',
 		// 7.6 : the server force a cache on all URL, so to bypass the cache, then create a different URL
 		var d = new Date();
 		
-		$http.get( '?page=custompage_ping&action=loadprops&t='+d.getTime() )
+		$http.get( '?page=custompage_ping&action=loadprops&t='+d.getTime(), this.getHttpConfig() )
 				.success( function ( jsonResult, statusHttp, headers, config ) {
 					// connection is lost ?
 					if (statusHttp==401 || typeof jsonResult === 'string') {
