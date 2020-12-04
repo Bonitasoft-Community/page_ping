@@ -6,7 +6,7 @@
 (function() {
 
 
-var appCommand = angular.module('pingmonitor', ['googlechart', 'ui.bootstrap','ngSanitize', 'ngModal', 'ngMaterial',  'toaster', 'ngCookies']);
+var appCommand = angular.module('pingmonitor', ['googlechart','ui.bootstrap','ngSanitize', 'ngModal', 'ngMaterial', 'toaster', 'ngAnimate', 'ngCookies']); 
 
 
 /* Material : for the autocomplete
@@ -30,7 +30,8 @@ var appCommand = angular.module('pingmonitor', ['googlechart', 'ui.bootstrap','n
 
 // Ping the server
 appCommand.controller('PingControler',
-	function ( $http, $scope,$sce,$filter, toaster,$cookies ) {
+  
+	function ( $http, $scope,$sce,$filter, toaster, $cookies  ) { // 
 
 	this.pingdate='';
 	this.pinginfo='';
@@ -47,7 +48,7 @@ appCommand.controller('PingControler',
 		console.log("GetHttpConfig : "+angular.toJson( config));
 		return config;
 	}
-	
+
 	this.ping = function()
 	{
 		
@@ -75,12 +76,12 @@ appCommand.controller('PingControler',
 					$scope.chartObject		 	= JSON.parse(jsonResult.chartObject);
 	
 					self.inprogress=false;
-					toaster.pop('success', "Information received", "");
-					
+					console.log("toast");
+					toaster.pop("success", "Information received", "");
+					console.log("toast done");
 						
 				})
 				.error( function() {
-					alert('an error occure');
 					self.inprogress=false;
 					});
 				
@@ -183,7 +184,7 @@ appCommand.controller('PingControler',
 					
 				})
 				.error( function() {
-					alert('an error occure');
+					self.inprogress=false;
 					});
 	}
 	
@@ -208,7 +209,7 @@ appCommand.controller('PingControler',
 		
 				})
 				.error( function() {
-					alert('an error occure');
+					self.inprogress		= false;
 					});
 	}
 	this.loadProps();
@@ -216,7 +217,7 @@ appCommand.controller('PingControler',
 	
 	<!-- Manage the event -->
 	this.getListEvents = function ( listevents ) {
-		return $sce.trustAsHtml(  listevents );
+		return $sce.trustAsHtml(  listevents );		
 	}
 	<!-- Manage the Modal -->
 	this.isshowDialog=false;

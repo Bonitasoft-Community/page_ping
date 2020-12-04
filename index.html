@@ -18,12 +18,9 @@
 	<link rel="stylesheet" href="style/style.css">
     <link rel="stylesheet" href="style/ng-modal.css">
 	<link rel="stylesheet" href="style/angular-material.min.css"> 
+	<link rel="stylesheet" href="style/toaster.css">
 	 
 	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
-	<script type="text/javascript" src="https://www.google.com/uds/?file=visualization&amp;v=1&amp;hl=fr&amp;packages=corechart&amp;async=2"></script>
-	<link type="text/css" href="https://www.google.com/uds/api/visualization/1.0/ff67c3772da186a412ae3231c32409e9/ui+fr.css" rel="stylesheet">
-	<script type="text/javascript" src="https://www.google.com/uds/api/visualization/1.0/ff67c3772da186a412ae3231c32409e9/format+fr,default+fr,ui+fr,corechart+fr.I.js"></script>
-	<link href="https://ajax.googleapis.com/ajax/static/modules/gviz/1.0/core/tooltip.css" rel="stylesheet" type="text/css">
 		
 <style>
 .Loading {
@@ -54,22 +51,25 @@
 <div class="container-fluid" id="accordion">
 	<div class="row">
 		<div class="component col-xs-12"  ng-controller="PingControler as pingctrl">
-			<legend class="text-primary"><span class="glyphicon glyphicon-th"></span>Ping server 2.5</legend>
+			<legend class="text-primary"><span class="glyphicon glyphicon-th"></span>Ping server 2.5.1</legend>
 			<div class="panel panel-primary">
 				<div class="explanation">
 				Ping Controler.
 				</div>
 				
-				
-				<div ng-show="pingctrl.inprogress">
-					<span class="Loading">.</span>
-					Please wait, collect in progress
-				</div>
-				<button ng-click="pingctrl.ping()" ng-disable="pingctrl.inprogress" class="btn btn-info btn-xs">Collect informations</button>
-				
-				&nbsp;&nbsp;
-				<button class="btn btn-info btn-xs" ng-click="pingctrl.openDialog()">Dialog</button> <p>
-				
+				<table> 
+				<tr><td style="padding-right: 40px;vertical-align: top;">
+					<button ng-click="pingctrl.ping()" ng-disable="pingctrl.inprogress" class="btn btn-info btn-xs">Collect informations</button>
+				</td><td style="padding-right: 40px;vertical-align: top;">
+					<button ng-click="pingctrl.openDialog()" ng-disable="pingctrl.inprogress" class="btn btn-info btn-xs">Dialog</button> <p>
+				</td><td>
+					<div ng-show="pingctrl.inprogress">
+						<span class="Loading">.</span>
+						Please wait, collect in progress
+					</div>
+				</td></tr>
+				</table>
+				<toaster-container></toaster-container>
 				
 				<div class="row">
 					<div class="col-lg-1">
@@ -209,7 +209,7 @@
 <script src="3rd-party/angular-sanitize.min.js"></script> 
 <script src="3rd-party/ng-modal.min.js"></script> 
 
-<!--  Material -->  
+<!--  Material (autocomplete) -->  
 <script src="3rd-party/angular-animate.min.js"></script>  
 <script src="3rd-party/angular-aria.min.js"></script>  
 <script src="3rd-party/angular-messages.min.js"></script>  
@@ -217,6 +217,7 @@
 
 
 
+<script src="3rd-party/toaster.min.js"></script>
 
 
   
