@@ -12,21 +12,19 @@ public class TokenValidator {
     /**
      * Logger
      */
-    private static final def LOGGER = Logger.getLogger(TokenValidator.class.getName());
+    private static final def LOGGER = Logger.getLogger("org.bonitasoft.custompage.TokenValidator");
 
     public static boolean checkCSRFToken(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
 
         //Get CSRF token from request in 'X-Bonita-API-Token' header
         def headerFromRequest = httpRequest.getHeader(CSRF_TOKEN_HEADER);
         def apiToken = httpRequest.getSession().getAttribute(API_TOKEN_SESSION_ATTR);
-    		if (apiToken != null) {
+        if (apiToken != null) {
             if (headerFromRequest == null || !headerFromRequest.equals(apiToken)) {
-                if (LOGGER.isLoggable(Level.FINE)) {
-                    LOGGER.log(Level.FINE, "Token Validation failed, expected: " + apiToken + ", received: " + headerFromRequest);
-                }
+                LOGGER.severe( "Token Validation failed, expected: " + apiToken + ", received: " + headerFromRequest);
                 httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return false;
-    	      } else {
+            } else {
                 if (LOGGER.isLoggable(Level.FINE)) {
                     LOGGER.log(Level.FINE, "Token Validation succeeded");
                 }

@@ -215,11 +215,11 @@ appCommand.controller('PingControler',
 	this.loadProps();
 
 	
-	<!-- Manage the event -->
+	// Manage the event 
 	this.getListEvents = function ( listevents ) {
 		return $sce.trustAsHtml(  listevents );		
 	}
-	<!-- Manage the Modal -->
+	// Manage the Modal 
 	this.isshowDialog=false;
 	this.openDialog = function()
 	{
